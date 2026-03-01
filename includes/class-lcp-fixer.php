@@ -44,14 +44,55 @@ class DW_LCP_Fixer {
             return $html;
         }
 
-        // 1. Impreza w-image-h içindeki ilk görseli bul ve düzelt
+        // 1. Impreza'nın tema içine hardcode ettiği Google Fonts'u async yap (750ms render-blocking kurtarır)
+        $html = $this->make_google_fonts_async( $html );
+
+        // 2. Impreza w-image-h içindeki ilk görseli bul ve düzelt
         $html = $this->fix_impreza_lcp_image( $html );
 
-        // 2. AppIcon ve büyük PNG'leri tespit et (log için)
+        // 3. AppIcon ve büyük PNG'leri tespit et (log için)
         $this->detect_large_images( $html );
 
-        // 3. Preload LCP görseli için <link> ekle (head'e)
+        // 4. Preload LCP görseli için <link> ekle (head'e)
         $html = $this->inject_lcp_preload( $html );
+
+        return $html;
+    }
+
+    /* -------------------------------------------------------
+       Google Fonts async — Impreza tema hardcode'u için
+       Tema, fonts.googleapis.com CSS'ini doğrudan <head>'e yazar,
+       style_loader_tag filtresi bunu yakalayamaz.
+       Çözüm: print media trick → render blocking olmadan yükle.
+    ------------------------------------------------------- */
+    private function make_google_fonts_async( $html ) {
+        // <link rel="stylesheet" href="https://fonts.googleapis.com/..."> etiketlerini yakala
+        $pattern = '/<link([^>]+)href=["\']([^"\']*fonts\.googleapis\.com[^"\']*)["\']([^>]*)>/i';
+
+        $html = preg_replace_callback(
+            $pattern,
+            function ( $m ) {
+                $before = $m[1];
+                $href   = $m[2];
+                $after  = $m[3];
+
+                // display=optional ekle (zaten yoksa)
+                if ( strpos( $href, 'display=' ) === false ) {
+                    $href .= ( strpos( $href, '?' ) !== false ? '&' : '?' ) . 'display=optional';
+                } else {
+                    $href = preg_replace( '/display=([^&]+)/', 'display=optional', $href );
+                }
+
+                // rel="stylesheet" zaten orada; sadece media'yı değiştir ve onload ekle
+                $async_tag =
+                    '<link' . $before . 'rel="stylesheet" media="print" onload="this.media=\'all\'"' .
+                    ' href="' . $href . '"' . $after . '>' .
+                    '<noscript><link rel="stylesheet" href="' . $href . '"></noscript>';
+
+                return $async_tag;
+            },
+            $html
+        );
 
         return $html;
     }

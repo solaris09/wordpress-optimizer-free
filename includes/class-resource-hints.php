@@ -17,8 +17,7 @@ class DW_Resource_Hints {
         if ( get_option( 'dw_perf_preconnect' ) ) {
             // Preconnect + DNS-prefetch en erken önce gelsin
             add_action( 'wp_head', array( $this, 'add_preconnect_tags' ), 1 );
-            // WP'nin kendi resource-hints sistemine de ekle
-            add_filter( 'wp_resource_hints', array( $this, 'filter_resource_hints' ), 10, 2 );
+            // NOT: wp_resource_hints filtresi KALDIRILDI — add_preconnect_tags() ile çift preconnect oluşturuyordu
         }
 
         if ( get_option( 'dw_perf_font_display_swap' ) ) {
@@ -59,40 +58,29 @@ class DW_Resource_Hints {
         }
     }
 
-    public function filter_resource_hints( $hints, $relation_type ) {
-        if ( 'preconnect' === $relation_type ) {
-            $hints[] = array( 'href' => 'https://fonts.googleapis.com' );
-            $hints[] = array( 'href' => 'https://fonts.gstatic.com', 'crossorigin' => 'anonymous' );
-        }
-        return $hints;
-    }
-
     /* -------------------------------------------------------
-       2. Font-display: swap — CSS override ile
+       2. Font-display: optional — CLS'yi sıfırla
     ------------------------------------------------------- */
     public function add_font_display_swap() {
         ?>
         <style id="dw-font-display">
-        /* Dijitalworlds Performance: font-display swap */
-        @font-face { font-display: swap; }
-
-        /* Google Fonts yüklenmeden önce system font fallback */
-        body, .w-btn, .w-iconbox-title, .w-nav-item {
-            font-synthesis: weight style;
-        }
+        /* Dijitalworlds Performance: font-display optional — CLS sıfır */
+        /* optional: font render window çok kısa; yüklenmezse sistem fontuna düşer, reflow olmaz */
+        @font-face { font-display: optional; }
         </style>
         <?php
 
-        // Google Fonts URL'lerine &display=swap ekle
+        // Google Fonts URL'lerine &display=optional ekle (WP enqueue üzerinden eklenenler için)
         add_filter( 'style_loader_src', array( $this, 'add_display_swap_to_fonts' ), 10, 2 );
     }
 
     public function add_display_swap_to_fonts( $src, $handle ) {
         if ( strpos( $src, 'fonts.googleapis.com' ) !== false ) {
             if ( strpos( $src, 'display=' ) === false ) {
-                $src = add_query_arg( 'display', 'swap', $src );
+                $src = add_query_arg( 'display', 'optional', $src );
             } else {
-                $src = preg_replace( '/display=([^&]+)/', 'display=swap', $src );
+                // swap dahil her değeri optional ile değiştir
+                $src = preg_replace( '/display=([^&]+)/', 'display=optional', $src );
             }
         }
         return $src;
