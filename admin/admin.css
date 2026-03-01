@@ -1,0 +1,327 @@
+/* ===========================
+   Dijitalworlds Performance
+   Admin Panel Styles
+   =========================== */
+
+* { box-sizing: border-box; }
+
+.dw-wrap {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    max-width: 1100px;
+    margin: 20px auto;
+    padding: 0 20px;
+}
+
+/* Header */
+.dw-header {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    color: #fff;
+    padding: 28px 32px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
+.dw-header h1 {
+    font-size: 26px;
+    font-weight: 700;
+    margin: 0 0 6px;
+    color: #fff;
+}
+.dw-subtitle {
+    margin: 0;
+    opacity: 0.75;
+    font-size: 14px;
+}
+
+/* Notice */
+.dw-notice { border-radius: 8px; }
+
+/* Grid */
+.dw-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+/* Cards */
+.dw-card {
+    background: #fff;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,.06);
+}
+.dw-card-header {
+    background: #f8fafc;
+    padding: 12px 20px;
+    font-weight: 600;
+    font-size: 14px;
+    color: #1e293b;
+    border-bottom: 1px solid #e2e8f0;
+    letter-spacing: .3px;
+}
+.dw-card-body {
+    padding: 18px 20px;
+}
+
+/* Toggle Switch */
+.dw-toggle {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 4px;
+    cursor: pointer;
+    position: relative;
+}
+.dw-toggle input[type="checkbox"] {
+    display: none;
+}
+.dw-slider {
+    width: 44px;
+    height: 24px;
+    background: #cbd5e1;
+    border-radius: 12px;
+    flex-shrink: 0;
+    position: relative;
+    transition: background .2s;
+}
+.dw-slider::after {
+    content: '';
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    background: #fff;
+    border-radius: 50%;
+    top: 3px;
+    left: 3px;
+    transition: transform .2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,.2);
+}
+.dw-toggle input:checked + .dw-slider {
+    background: #3b82f6;
+}
+.dw-toggle input:checked + .dw-slider::after {
+    transform: translateX(20px);
+}
+.dw-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #334155;
+}
+.dw-hint {
+    margin: 0 0 16px 56px;
+    font-size: 12px;
+    color: #94a3b8;
+    line-height: 1.5;
+}
+
+/* Input Group */
+.dw-input-group {
+    margin: 12px 0;
+}
+.dw-input-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: #475569;
+    margin-bottom: 6px;
+}
+.dw-input-group input[type="url"],
+.dw-input-group input[type="text"] {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #1e293b;
+    transition: border-color .2s;
+}
+.dw-input-group input:focus {
+    border-color: #3b82f6;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59,130,246,.15);
+}
+.dw-input-group small {
+    display: block;
+    margin-top: 4px;
+    font-size: 11px;
+    color: #94a3b8;
+}
+
+/* Status Card */
+.dw-status-card { margin-bottom: 16px; }
+.dw-status-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 10px;
+}
+.dw-status-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 14px 10px;
+    border-radius: 8px;
+    text-align: center;
+    border: 1px solid #e2e8f0;
+}
+.dw-status-ok { background: #f0fdf4; border-color: #bbf7d0; }
+.dw-status-off { background: #fff7ed; border-color: #fed7aa; }
+.dw-status-icon { font-size: 20px; margin-bottom: 4px; }
+.dw-status-label { font-size: 12px; font-weight: 600; color: #475569; }
+.dw-status-val { font-size: 11px; color: #64748b; margin-top: 2px; }
+
+/* SEO Optimizer Card */
+.dw-seo-optimizer-card { margin-bottom: 16px; }
+.dw-seo-optimizer-card .dw-card-header { background: #f0f9ff; border-color: #bae6fd; color: #0369a1; }
+.dw-seo-run-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #0369a1;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .2s;
+    margin-top: 10px;
+}
+.dw-seo-run-btn:hover { background: #0284c7; }
+.dw-seo-run-btn:disabled { background: #94a3b8; cursor: not-allowed; }
+
+/* SEO Report Table */
+#dw-seo-report { margin-top: 20px; display: none; }
+#dw-seo-report h3 { font-size: 15px; margin-bottom: 10px; color: #1e293b; }
+.dw-report-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+.dw-report-table th {
+    background: #f1f5f9;
+    padding: 8px 12px;
+    text-align: left;
+    border-bottom: 2px solid #e2e8f0;
+    font-weight: 600;
+    color: #475569;
+}
+.dw-report-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+}
+.dw-report-table tr:hover td { background: #f8fafc; }
+.dw-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+}
+.dw-badge-ok { background: #dcfce7; color: #166534; }
+.dw-badge-warn { background: #fef9c3; color: #854d0e; }
+.dw-badge-fix { background: #dcfce7; color: #166534; }
+.dw-badge-skip { background: #f1f5f9; color: #64748b; }
+
+/* Actions */
+.dw-actions { display: flex; gap: 10px; align-items: center; }
+.dw-btn {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: #fff;
+    border: none;
+    padding: 11px 28px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity .2s;
+}
+.dw-btn:hover { opacity: .9; }
+
+/* SEO Özet Bar */
+.dw-summary-bar {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+    padding: 12px 16px;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    font-size: 13px;
+}
+.dw-sum-item { display: flex; align-items: center; gap: 4px; }
+.dw-sum-ok strong { color: #166534; }
+.dw-sum-warn strong { color: #854d0e; }
+.dw-sum-fix strong { color: #0369a1; }
+
+/* SEO Issues / Fixes */
+.dw-issues-list, .dw-fixes-list {
+    margin: 6px 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: 12px;
+}
+.dw-issues-list li { color: #854d0e; }
+.dw-fixes-list li { color: #166534; }
+
+/* Meta Description alan */
+.dw-meta-field { display: flex; flex-direction: column; gap: 4px; }
+.dw-meta-input {
+    width: 100%;
+    min-width: 220px;
+    padding: 6px 8px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 12px;
+    resize: vertical;
+    color: #1e293b;
+    font-family: inherit;
+    transition: border-color .2s;
+}
+.dw-meta-input:focus {
+    border-color: #3b82f6;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59,130,246,.15);
+}
+.dw-meta-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.dw-char-count { font-size: 11px; font-weight: 600; }
+.dw-save-btn {
+    background: #0369a1;
+    color: #fff;
+    border: none;
+    padding: 4px 12px;
+    border-radius: 5px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background .2s;
+}
+.dw-save-btn:hover { background: #0284c7; }
+.dw-save-btn:disabled { background: #94a3b8; cursor: not-allowed; }
+
+/* WP Edit Link */
+.dw-edit-link {
+    font-size: 12px;
+    color: #3b82f6;
+    text-decoration: none;
+    white-space: nowrap;
+}
+.dw-edit-link:hover { text-decoration: underline; }
+
+/* Spinner */
+.dw-spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255,255,255,.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: dw-spin .7s linear infinite;
+}
+@keyframes dw-spin { to { transform: rotate(360deg); } }

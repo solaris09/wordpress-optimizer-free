@@ -1,0 +1,31 @@
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# IDE / Editor
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Node (eğer ileride build tool eklersen)
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# WordPress geliştirme artıkları
+*.log
+wp-config.php
+
+# Build output
+/dist/
+/build/
+
+# Geçici dosyalar
+*.tmp
+*.bak
+*.swp
+*~
