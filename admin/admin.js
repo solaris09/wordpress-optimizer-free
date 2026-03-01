@@ -2,20 +2,22 @@
 (function ($) {
     'use strict';
 
+    var t = dwPerf.strings; // localized strings shorthand
+
     /* =====================================================
        SEO OPTIMIZER
     ===================================================== */
 
-    var $runBtn      = $('#dw-seo-run-btn');
-    var $autoFix     = $('#dw-seo-auto-fix');
-    var $reportWrap  = $('#dw-seo-report');
-    var $summary     = $('#dw-seo-summary');
-    var $tableBody   = $('#dw-seo-table-body');
+    var $runBtn     = $('#dw-seo-run-btn');
+    var $autoFix    = $('#dw-seo-auto-fix');
+    var $reportWrap = $('#dw-seo-report');
+    var $summary    = $('#dw-seo-summary');
+    var $tableBody  = $('#dw-seo-table-body');
 
     $runBtn.on('click', function () {
         var autoFix = $autoFix.is(':checked') ? '1' : '0';
 
-        $runBtn.prop('disabled', true).html('<span class="dw-spinner"></span> Taranıyor...');
+        $runBtn.prop('disabled', true).html('<span class="dw-spinner"></span> ' + t.scanning);
         $reportWrap.hide();
         $tableBody.empty();
         $summary.empty();
@@ -30,7 +32,7 @@
             },
             success: function (response) {
                 if (!response.success) {
-                    alert('Hata: ' + (response.data || 'Bilinmeyen hata.'));
+                    alert(t.err_save + ': ' + (response.data || t.err_generic));
                     return;
                 }
 
@@ -39,40 +41,39 @@
                 $reportWrap.fadeIn(300);
             },
             error: function () {
-                alert('AJAX isteği başarısız. Lütfen sayfayı yenileyip tekrar deneyin.');
+                alert(t.err_ajax);
             },
             complete: function () {
-                $runBtn.prop('disabled', false).html('🔍 SEO Tara & Optimize Et');
+                $runBtn.prop('disabled', false).html(t.scan_btn);
             },
         });
     });
 
-    /* ----- Özet render ----- */
+    /* ----- Summary render ----- */
     function renderSummary(s) {
-        var fixText = s.auto_fix ? ' (' + s.fixed + ' otomatik düzeltildi)' : '';
+        var fixText = s.auto_fix ? ' (' + s.fixed + ' ' + t.auto_fixed + ')' : '';
         $summary.html(
             '<div class="dw-summary-bar">' +
-            '<span class="dw-sum-item dw-sum-ok">✅ Sorunsuz: <strong>' + s.ok + '</strong></span>' +
-            '<span class="dw-sum-item dw-sum-warn">⚠️ Uyarı: <strong>' + s.warn + '</strong></span>' +
-            (s.auto_fix ? '<span class="dw-sum-item dw-sum-fix">🔧 Düzeltildi: <strong>' + s.fixed + '</strong></span>' : '') +
-            '<span class="dw-sum-item">Toplam: <strong>' + s.total + '</strong> sayfa' + fixText + '</span>' +
+            '<span class="dw-sum-item dw-sum-ok">✅ ' + t.ok_label + ': <strong>' + s.ok + '</strong></span>' +
+            '<span class="dw-sum-item dw-sum-warn">⚠️ ' + t.warn_label + ': <strong>' + s.warn + '</strong></span>' +
+            (s.auto_fix ? '<span class="dw-sum-item dw-sum-fix">🔧 ' + t.fixed_label + ': <strong>' + s.fixed + '</strong></span>' : '') +
+            '<span class="dw-sum-item">' + t.total_label + ': <strong>' + s.total + '</strong> ' + t.pages + fixText + '</span>' +
             '</div>'
         );
     }
 
-    /* ----- Tablo render ----- */
+    /* ----- Table render ----- */
     function renderReport(report) {
         report.forEach(function (row) {
             var statusBadge = '';
             if (row.status === 'ok') {
-                statusBadge = '<span class="dw-badge dw-badge-ok">✅ İyi</span>';
+                statusBadge = '<span class="dw-badge dw-badge-ok">' + t.ok_badge + '</span>';
             } else if (row.status === 'fixed') {
-                statusBadge = '<span class="dw-badge dw-badge-fix">🔧 Düzeltildi</span>';
+                statusBadge = '<span class="dw-badge dw-badge-fix">' + t.fixed_badge + '</span>';
             } else {
-                statusBadge = '<span class="dw-badge dw-badge-warn">⚠️ Uyarı</span>';
+                statusBadge = '<span class="dw-badge dw-badge-warn">' + t.warn_badge + '</span>';
             }
 
-            // Sorunlar listesi
             var issuesList = '';
             if (row.issues.length > 0) {
                 issuesList = '<ul class="dw-issues-list">' +
@@ -80,7 +81,6 @@
                     '</ul>';
             }
 
-            // Düzeltmeler listesi
             var fixesList = '';
             if (row.fixes.length > 0) {
                 fixesList = '<ul class="dw-fixes-list">' +
@@ -88,7 +88,6 @@
                     '</ul>';
             }
 
-            // Meta description alanı (düzenlenebilir)
             var metaLen  = row.meta_len || 0;
             var lenColor = metaLen >= 50 && metaLen <= 160 ? '#166534' : '#854d0e';
             var metaArea =
@@ -98,39 +97,39 @@
                 '</textarea>' +
                 '<div class="dw-meta-footer">' +
                 '<span class="dw-char-count" style="color:' + lenColor + ';">' + metaLen + '/160</span>' +
-                '<button class="dw-save-btn" data-post-id="' + row.id + '">Kaydet</button>' +
+                '<button class="dw-save-btn" data-post-id="' + row.id + '">' + t.save + '</button>' +
                 '</div>' +
                 '</div>';
 
             var $tr = $(
                 '<tr data-post-id="' + row.id + '">' +
                 '<td><a href="' + escHtml(row.url) + '" target="_blank">' + escHtml(row.title) + '</a>' +
-                '<br><small style="color:#94a3b8;">' + escHtml(row.type) + ' · ' + row.words + ' kelime</small></td>' +
+                '<br><small style="color:#94a3b8;">' + escHtml(row.type) + ' · ' + row.words + ' ' + t.words + '</small></td>' +
                 '<td>' + statusBadge + issuesList + fixesList + '</td>' +
                 '<td>' + metaArea + '</td>' +
-                '<td><a href="' + escHtml(row.edit_url) + '" target="_blank" class="dw-edit-link">WP Düzenle →</a></td>' +
+                '<td><a href="' + escHtml(row.edit_url) + '" target="_blank" class="dw-edit-link">' + t.edit_link + '</a></td>' +
                 '</tr>'
             );
 
             $tableBody.append($tr);
         });
 
-        // Karakter sayacı canlı güncelle
+        // Live char counter
         $tableBody.on('input', '.dw-meta-input', function () {
-            var len     = $(this).val().length;
+            var len      = $(this).val().length;
             var $counter = $(this).closest('.dw-meta-field').find('.dw-char-count');
             $counter.text(len + '/160');
             $counter.css('color', len >= 50 && len <= 160 ? '#166534' : '#854d0e');
         });
 
-        // Manuel kaydet butonu
+        // Manual save button
         $tableBody.on('click', '.dw-save-btn', function () {
-            var $btn    = $(this);
-            var postId  = $btn.data('post-id');
-            var $input  = $btn.closest('.dw-meta-field').find('.dw-meta-input');
+            var $btn     = $(this);
+            var postId   = $btn.data('post-id');
+            var $input   = $btn.closest('.dw-meta-field').find('.dw-meta-input');
             var metaDesc = $input.val();
 
-            $btn.prop('disabled', true).text('Kaydediliyor...');
+            $btn.prop('disabled', true).text(t.saving);
 
             $.ajax({
                 url: dwPerf.ajax_url,
@@ -143,28 +142,27 @@
                 },
                 success: function (res) {
                     if (res.success) {
-                        $btn.text('✅ Kaydedildi');
+                        $btn.text(t.saved);
                         setTimeout(function () {
-                            $btn.prop('disabled', false).text('Kaydet');
+                            $btn.prop('disabled', false).text(t.save);
                         }, 2000);
 
-                        // Satırın durumunu güncelle
                         var $row = $tableBody.find('tr[data-post-id="' + postId + '"]');
-                        $row.find('.dw-badge').replaceWith('<span class="dw-badge dw-badge-fix">🔧 Düzeltildi</span>');
+                        $row.find('.dw-badge').replaceWith('<span class="dw-badge dw-badge-fix">' + t.fixed_badge + '</span>');
                     } else {
-                        alert('Kayıt hatası: ' + (res.data || 'Bilinmeyen'));
-                        $btn.prop('disabled', false).text('Kaydet');
+                        alert(t.err_save + ': ' + (res.data || t.err_generic));
+                        $btn.prop('disabled', false).text(t.save);
                     }
                 },
                 error: function () {
-                    alert('AJAX hatası.');
-                    $btn.prop('disabled', false).text('Kaydet');
+                    alert(t.err_ajax);
+                    $btn.prop('disabled', false).text(t.save);
                 },
             });
         });
     }
 
-    /* ----- Yardımcı: HTML escape ----- */
+    /* ----- Helper: HTML escape ----- */
     function escHtml(str) {
         if (!str) { return ''; }
         return String(str)

@@ -20,6 +20,13 @@
     border-radius: 12px;
     margin-bottom: 20px;
 }
+.dw-header-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+}
 .dw-header h1 {
     font-size: 26px;
     font-weight: 700;
@@ -30,6 +37,40 @@
     margin: 0;
     opacity: 0.75;
     font-size: 14px;
+}
+
+/* Language Switcher */
+.dw-lang-switcher {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    margin-top: 4px;
+}
+.dw-lang-label {
+    font-size: 16px;
+    opacity: .8;
+}
+.dw-lang-btn {
+    background: rgba(255,255,255,.12);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,.25);
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background .2s, border-color .2s;
+    letter-spacing: .3px;
+}
+.dw-lang-btn:hover {
+    background: rgba(255,255,255,.22);
+    border-color: rgba(255,255,255,.45);
+}
+.dw-lang-btn.dw-lang-active {
+    background: rgba(255,255,255,.28);
+    border-color: #fff;
+    font-weight: 700;
 }
 
 /* Notice */
