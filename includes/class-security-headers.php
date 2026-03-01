@@ -60,12 +60,16 @@ class DW_Security_Headers {
         // Content Security Policy — WordPress + Google servisleriyle uyumlu
         $csp = implode( '; ', array(
             "default-src 'self'",
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://accounts.google.com https://static.cloudflareinsights.com https://pagead2.googlesyndication.com https://www.googleadservices.com",
-            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+            // blob: eklendi: wp-emoji worker için (Creating a worker from 'blob:...' hatası)
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://www.googletagmanager.com https://www.google-analytics.com https://accounts.google.com https://static.cloudflareinsights.com https://pagead2.googlesyndication.com https://www.googleadservices.com",
+            // accounts.google.com eklendi: GSI stylesheet için (/gsi/style hatası)
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com",
             "font-src 'self' data: https://fonts.gstatic.com",
             "img-src 'self' data: https: blob:",
             "connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://stats.g.doubleclick.net https://cloudflareinsights.com",
             "frame-src https://www.googletagmanager.com https://bid.g.doubleclick.net",
+            // wp-emoji ve GTM worker'ları için blob: worker-src eklendi
+            "worker-src 'self' blob:",
             "object-src 'none'",
             "base-uri 'self'",
             "form-action 'self'",

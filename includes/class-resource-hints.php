@@ -40,16 +40,16 @@ class DW_Resource_Hints {
        1. Preconnect + DNS-prefetch
     ------------------------------------------------------- */
     public function add_preconnect_tags() {
+        // Maksimum 4 preconnect: fazlası PageSpeed uyarısı verir
         $origins = array(
-            // Google Fonts — 2 aşamalı preconnect
+            // Google Fonts — 2 aşamalı preconnect (LCP için kritik)
             array( 'url' => 'https://fonts.googleapis.com', 'crossorigin' => false ),
             array( 'url' => 'https://fonts.gstatic.com',   'crossorigin' => true  ),
             // Google Tag Manager
             array( 'url' => 'https://www.googletagmanager.com', 'crossorigin' => false ),
             // Google Analytics
             array( 'url' => 'https://www.google-analytics.com', 'crossorigin' => false ),
-            // Cloudflare Insights
-            array( 'url' => 'https://static.cloudflareinsights.com', 'crossorigin' => false ),
+            // Cloudflare Insights kaldırıldı: preconnect >4 uyarısı veriyordu
         );
 
         foreach ( $origins as $origin ) {
