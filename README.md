@@ -3,6 +3,25 @@
 > **Dijitalworlds.com** için özel geliştirilmiş, hız & SEO optimizasyon eklentisi.
 > Custom WordPress performance & SEO optimization plugin for dijitalworlds.com.
 
+## 👤 Yazar / Author
+
+**Cemal Hekimoğlu**
+- Web: [dijitalworlds.com](https://dijitalworlds.com)
+- GitHub: [@solaris09](https://github.com/solaris09)
+
+## 📄 Lisans / License
+
+Bu proje **Apache License 2.0** lisansı ile yayınlanmıştır.
+This project is licensed under the **Apache License 2.0**.
+
+> Kodu özgürce kullanabilir, değiştirebilir ve dağıtabilirsiniz.
+> Tek şart: Orijinal yazar adını (Cemal Hekimoğlu) ve lisans bilgisini koruyun.
+>
+> You are free to use, modify, and distribute this code.
+> Only requirement: Keep the original author name (Cemal Hekimoğlu) and license notice.
+
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
 ---
 
 ## 🇹🇷 Türkçe
