@@ -18,6 +18,7 @@ class DW_Settings_Page {
         add_action( 'admin_menu', array( $this, 'add_menu' ) );
         add_action( 'admin_init', array( $this, 'register_settings' ) );
         add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
+        add_action( 'wp_ajax_dw_clear_cache', array( $this, 'ajax_clear_cache' ) );
         add_filter(
             'plugin_action_links_' . plugin_basename( DW_PERF_PATH . 'dijitalworlds-performance.php' ),
             array( $this, 'add_action_links' )
@@ -68,25 +69,32 @@ class DW_Settings_Page {
             'nonce'    => wp_create_nonce( 'dw_seo_nonce' ),
             'lang'     => $this->lang,
             'strings'  => array(
-                'scanning'    => $this->s['scanning'],
-                'scan_btn'    => $this->s['seo_run_btn'],
-                'save'        => $this->s['save'],
-                'saving'      => $this->s['saving'],
-                'saved'       => $this->s['saved'],
-                'err_generic' => $this->s['err_generic'],
-                'err_ajax'    => $this->s['err_ajax'],
-                'err_save'    => $this->s['err_save'],
-                'fixed_badge' => $this->s['fixed_badge'],
-                'ok_badge'    => $this->s['ok_badge'],
-                'warn_badge'  => $this->s['warn_badge'],
-                'words'       => $this->s['words'],
-                'auto_fixed'  => $this->s['auto_fixed'],
-                'ok_label'    => $this->s['ok_label'],
-                'warn_label'  => $this->s['warn_label'],
-                'fixed_label' => $this->s['fixed_label'],
-                'total_label' => $this->s['total_label'],
-                'pages'       => $this->s['pages'],
-                'edit_link'   => $this->s['edit_link'],
+                'scanning'       => $this->s['scanning'],
+                'scan_btn'       => $this->s['seo_run_btn'],
+                'save'           => $this->s['save'],
+                'saving'         => $this->s['saving'],
+                'saved'          => $this->s['saved'],
+                'err_generic'    => $this->s['err_generic'],
+                'err_ajax'       => $this->s['err_ajax'],
+                'err_save'       => $this->s['err_save'],
+                'fixed_badge'    => $this->s['fixed_badge'],
+                'ok_badge'       => $this->s['ok_badge'],
+                'warn_badge'     => $this->s['warn_badge'],
+                'words'          => $this->s['words'],
+                'auto_fixed'     => $this->s['auto_fixed'],
+                'ok_label'       => $this->s['ok_label'],
+                'warn_label'     => $this->s['warn_label'],
+                'fixed_label'    => $this->s['fixed_label'],
+                'total_label'    => $this->s['total_label'],
+                'pages'          => $this->s['pages'],
+                'edit_link'      => $this->s['edit_link'],
+                'clear_cache'        => $this->s['clear_cache_btn'],
+                'clearing_cache'     => $this->s['clearing_cache'],
+                'cache_cleared'      => $this->s['cache_cleared'],
+                'cache_error'        => $this->s['cache_error'],
+                'cache_result_title' => $this->s['cache_result_title'],
+                'cache_varnish_found'=> $this->s['cache_varnish_found'],
+                'cache_varnish_none' => $this->s['cache_varnish_none'],
             ),
         ) );
     }
@@ -293,12 +301,111 @@ class DW_Settings_Page {
 
                 <div class="dw-actions">
                     <button type="submit" class="dw-btn"><?php echo esc_html( $s['save_btn'] ); ?></button>
+                    <button type="button" id="dw-clear-cache-btn" class="dw-btn-danger">
+                        🗑️ <?php echo esc_html( $s['clear_cache_btn'] ); ?>
+                    </button>
                     <span style="font-size:12px;color:#94a3b8;">v<?php echo esc_html( DW_PERF_VERSION ); ?></span>
                 </div>
+                <div id="dw-cache-result" style="display:none;" class="dw-cache-result"></div>
 
             </form>
         </div>
         <?php
+    }
+
+    /* -------------------------------------------------------
+       AJAX: Tüm önbelleği temizle
+    ------------------------------------------------------- */
+    public function ajax_clear_cache() {
+        check_ajax_referer( 'dw_seo_nonce', 'nonce' );
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( 'Yetki yok.' );
+        }
+
+        $cleared = array();
+
+        // 1. WordPress object cache
+        wp_cache_flush();
+        $cleared[] = 'WordPress Object Cache';
+
+        // 2. WordPress transientleri temizle
+        global $wpdb;
+        $wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_%'" );
+        $wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '_site_transient_%'" );
+        $cleared[] = 'Transients';
+
+        // 3. WP Super Cache
+        if ( function_exists( 'wp_cache_clean_cache' ) ) {
+            global $file_prefix;
+            wp_cache_clean_cache( $file_prefix, true );
+            $cleared[] = 'WP Super Cache';
+        }
+
+        // 4. W3 Total Cache
+        if ( function_exists( 'w3tc_pgcache_flush' ) ) {
+            w3tc_pgcache_flush();
+            $cleared[] = 'W3 Total Cache';
+        }
+
+        // 5. WP Rocket
+        if ( function_exists( 'rocket_clean_domain' ) ) {
+            rocket_clean_domain();
+            $cleared[] = 'WP Rocket';
+        }
+
+        // 6. LiteSpeed Cache
+        if ( class_exists( 'LiteSpeed_Cache_API' ) ) {
+            do_action( 'litespeed_purge_all' );
+            $cleared[] = 'LiteSpeed Cache';
+        }
+
+        // 7. WP Fastest Cache
+        if ( isset( $GLOBALS['wp_fastest_cache'] ) && method_exists( $GLOBALS['wp_fastest_cache'], 'deleteCache' ) ) {
+            $GLOBALS['wp_fastest_cache']->deleteCache( true );
+            $cleared[] = 'WP Fastest Cache';
+        }
+
+        // 8. Autoptimize
+        if ( class_exists( 'autoptimizeCache' ) && method_exists( 'autoptimizeCache', 'clearall' ) ) {
+            autoptimizeCache::clearall();
+            $cleared[] = 'Autoptimize';
+        }
+
+        // 9. Varnish Cache
+        // 9a. "Varnish HTTP Purge" eklentisi (Mika Epstein)
+        if ( class_exists( 'VarnishPurger' ) ) {
+            do_action( 'wpvarnish_purge_url', home_url( '/' ) );
+            $cleared[] = 'Varnish (eklenti)';
+        }
+        // 9b. Varnish HTTP Purge eklentisinin purge_url hook'u
+        if ( has_action( 'vhp_purge_url' ) ) {
+            do_action( 'vhp_purge_url', home_url( '/' ) );
+        }
+        // 9c. Doğrudan HTTP PURGE isteği (BAN yöntemi)
+        $varnish_host = defined( 'VHP_VARNISH_IP' ) ? VHP_VARNISH_IP : '127.0.0.1';
+        $varnish_port = defined( 'VHP_VARNISH_PORT' ) ? VHP_VARNISH_PORT : 6081;
+        $purge_url    = 'http://' . $varnish_host . ':' . $varnish_port . '/';
+        $response     = wp_remote_request( $purge_url, array(
+            'method'  => 'PURGE',
+            'headers' => array(
+                'Host'           => wp_parse_url( home_url(), PHP_URL_HOST ),
+                'X-Purge-Method' => 'regex',
+                'X-Purge-Regex'  => '.*',
+            ),
+            'timeout'    => 5,
+            'sslverify'  => false,
+        ) );
+        if ( ! is_wp_error( $response ) ) {
+            $code = wp_remote_retrieve_response_code( $response );
+            if ( in_array( $code, array( 200, 204, 400, 301, 302 ), true ) ) {
+                $cleared[] = 'Varnish (HTTP PURGE)';
+            }
+        }
+
+        // 10. Rewrite kurallarını yenile
+        flush_rewrite_rules( false );
+
+        wp_send_json_success( array( 'cleared' => $cleared ) );
     }
 
     private function save_settings() {
@@ -437,6 +544,13 @@ class DW_Settings_Page {
             'th_access'          => 'Erişim',
             // Eylemler
             'save_btn'           => '💾 Ayarları Kaydet',
+            'clear_cache_btn'    => 'Tüm Önbelleği Temizle',
+            'clearing_cache'     => 'Temizleniyor...',
+            'cache_cleared'      => '✅ Önbellek temizlendi!',
+            'cache_error'        => 'Önbellek temizlenirken hata oluştu.',
+            'cache_result_title' => 'Temizlenen önbellekler:',
+            'cache_varnish_found'=> '🟢 Varnish Önbelleği bulundu ve temizlendi',
+            'cache_varnish_none' => '🔴 Varnish Önbelleği bulunamadı (sunucu yanıt vermedi)',
             'save'               => 'Kaydet',
             'saving'             => 'Kaydediliyor...',
             'saved'              => '✅ Kaydedildi',
@@ -520,6 +634,13 @@ class DW_Settings_Page {
             'th_access'          => 'Access',
             // Actions
             'save_btn'           => '💾 Save Settings',
+            'clear_cache_btn'    => 'Clear All Cache',
+            'clearing_cache'     => 'Clearing...',
+            'cache_cleared'      => '✅ Cache cleared!',
+            'cache_error'        => 'An error occurred while clearing cache.',
+            'cache_result_title' => 'Cleared caches:',
+            'cache_varnish_found'=> '🟢 Varnish Cache found and cleared',
+            'cache_varnish_none' => '🔴 Varnish Cache not found (server did not respond)',
             'save'               => 'Save',
             'saving'             => 'Saving...',
             'saved'              => '✅ Saved',

@@ -162,6 +162,62 @@
         });
     }
 
+    /* =====================================================
+       CLEAR CACHE
+    ===================================================== */
+
+    var $clearBtn    = $('#dw-clear-cache-btn');
+    var $cacheResult = $('#dw-cache-result');
+
+    $clearBtn.on('click', function () {
+        $clearBtn.prop('disabled', true).html('<span class="dw-spinner dw-spinner-dark"></span> ' + t.clearing_cache);
+        $cacheResult.hide().empty();
+
+        $.ajax({
+            url: dwPerf.ajax_url,
+            method: 'POST',
+            data: {
+                action: 'dw_clear_cache',
+                nonce: dwPerf.nonce,
+            },
+            success: function (response) {
+                if (response.success) {
+                    $clearBtn.html('✅ ' + t.cache_cleared);
+                    setTimeout(function () {
+                        $clearBtn.prop('disabled', false).html('🗑️ ' + t.clear_cache);
+                    }, 2500);
+
+                    var cleared  = response.data.cleared || [];
+                    var hasVarnish = cleared.some(function (c) {
+                        return c.toLowerCase().indexOf('varnish') !== -1;
+                    });
+
+                    // Her önbellek için badge satırı oluştur
+                    var items = cleared.map(function (c) {
+                        return '<span class="dw-cache-tag">' + escHtml(c) + '</span>';
+                    }).join('');
+
+                    // Varnish durum satırı
+                    var varnishLine = hasVarnish
+                        ? '<div class="dw-cache-varnish dw-cache-varnish-ok">' + t.cache_varnish_found + '</div>'
+                        : '<div class="dw-cache-varnish dw-cache-varnish-err">' + t.cache_varnish_none + '</div>';
+
+                    $cacheResult
+                        .html('<strong>' + t.cache_result_title + '</strong><div class="dw-cache-tags">' + items + '</div>' + varnishLine)
+                        .addClass(hasVarnish ? 'dw-cache-result-ok' : 'dw-cache-result-warn')
+                        .fadeIn(300);
+                } else {
+                    alert(t.cache_error);
+                    $clearBtn.prop('disabled', false).html('🗑️ ' + t.clear_cache);
+                }
+            },
+            error: function () {
+                alert(t.err_ajax);
+                $clearBtn.prop('disabled', false).html('🗑️ ' + t.clear_cache);
+            },
+        });
+    });
+
     /* ----- Helper: HTML escape ----- */
     function escHtml(str) {
         if (!str) { return ''; }
